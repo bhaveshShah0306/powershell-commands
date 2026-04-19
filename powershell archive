@@ -1,0 +1,1 @@
+Compress-Archive -Path "C:\inetpub\wwwroot\{project path}\*" -DestinationPath "E:\Backup\{destinationfolderpath}.zip" -CompressionLevel Optimal
