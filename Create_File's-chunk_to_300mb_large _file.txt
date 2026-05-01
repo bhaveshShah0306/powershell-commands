@@ -1,0 +1,35 @@
+# ── CONFIGURATION ──────────────────────────────────────────────
+$sourceFolder = "C:\Path\To\YourFolder"       # <-- Change this
+$outputZip    = "C:\Temp\archive.zip"          # Temp zip location
+$chunkDir     = "C:\Temp\ZipChunks"            # Output chunks folder
+$chunkSizeMB  = 300
+# ───────────────────────────────────────────────────────────────
+
+$chunkSize = $chunkSizeMB * 1MB
+
+# Step 1: Compress the folder into a single ZIP
+Write-Host "Compressing folder... (this may take a while for 7-8 GB)" -ForegroundColor Cyan
+Compress-Archive -Path $sourceFolder -DestinationPath $outputZip -CompressionLevel Optimal -Force
+
+# Step 2: Split the ZIP into 300 MB chunks
+New-Item -ItemType Directory -Path $chunkDir -Force | Out-Null
+Write-Host "Splitting into $chunkSizeMB MB chunks..." -ForegroundColor Cyan
+
+$stream   = [System.IO.File]::OpenRead($outputZip)
+$buffer   = New-Object byte[] $chunkSize
+$chunkNum = 1
+
+while (($bytesRead = $stream.Read($buffer, 0, $buffer.Length)) -gt 0) {
+    $chunkPath = Join-Path $chunkDir ("archive.part{0:D3}.zip" -f $chunkNum)
+    $fileStream = [System.IO.File]::OpenWrite($chunkPath)
+    $fileStream.Write($buffer, 0, $bytesRead)
+    $fileStream.Close()
+    Write-Host "  Created: $chunkPath ($([Math]::Round($bytesRead/1MB, 1)) MB)"
+    $chunkNum++
+}
+
+$stream.Close()
+
+# Step 3: Clean up the temp full ZIP (optional)
+Remove-Item $outputZip -Force
+Write-Host "`nDone! $($chunkNum - 1) chunks saved to: $chunkDir" -ForegroundColor Green
