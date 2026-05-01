@@ -8,7 +8,7 @@ $chunkSizeMB  = 300
 $chunkSize = $chunkSizeMB * 1MB
 
 # Step 1: Compress the folder into a single ZIP
-Write-Host "Compressing folder... (this may take a while for 7-8 GB)" -ForegroundColor Cyan
+Write-Host "Compressing folder... (this may take a while for LARGE file(10-20 GB or equivalent))" -ForegroundColor Cyan
 Compress-Archive -Path $sourceFolder -DestinationPath $outputZip -CompressionLevel Optimal -Force
 
 # Step 2: Split the ZIP into 300 MB chunks
