@@ -1,0 +1,3 @@
+netstat -aon | findstr /i "LISTENING ESTABLISHED TIME_WAIT" 
+
+// to find all active connections where the status is listening, established and time_wait.
